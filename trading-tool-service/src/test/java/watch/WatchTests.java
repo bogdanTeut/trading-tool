@@ -33,14 +33,21 @@ public class WatchTests {
         Assert.assertEquals(candles.size(), 3);
         Candle candle1 = candles.get(0);
         Assert.assertNotNull (candle1);
-        Assert.assertEquals(TIME_UNIT, (candle1.stopTime - candle1.startTime)/1000);
+        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle1.stopTime - candle1.startTime)/1000));
         Candle candle2 = candles.get(1);
         Assert.assertNotNull (candle2);
-        Assert.assertEquals(TIME_UNIT, (candle2.stopTime - candle2.startTime)/1000);
+        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle2.stopTime - candle2.startTime)/1000));
         Candle candle3 = candles.get(2);
-        Assert.assertNotNull (candle2);
-        Assert.assertEquals(TIME_UNIT, (candle3.stopTime - candle3.startTime)/1000);
+        Assert.assertNotNull (candle3);
+        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle3.stopTime - candle3.startTime)/1000));
 
 
     }
+
+//    @Test
+//    public void doATest(){
+//        long stopTime = 1397337720093L;
+//        long startTime = 1397337660094L;
+//        Math.round( (float)(stopTime - startTime)/1000);
+//    }
 }

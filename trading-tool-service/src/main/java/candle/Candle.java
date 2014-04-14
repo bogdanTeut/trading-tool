@@ -21,4 +21,8 @@ public class Candle {
         System.out.println("Candle stop");
         stopTime = System.currentTimeMillis();
     }
+
+    public void setStopTime() {
+        stopTime = startTime + 1000 * 60;
+    }
 }

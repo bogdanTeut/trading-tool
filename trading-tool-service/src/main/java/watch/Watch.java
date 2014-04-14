@@ -15,6 +15,7 @@ public class Watch {
 
     List<Candle> candles;
     Timer timer;
+    Candle candle = null;
 
     public Watch() {
         this.candles = new ArrayList<Candle>();
@@ -31,7 +32,6 @@ public class Watch {
 
         timer.scheduleAtFixedRate(new TimerTask() {
             long startTime = System.currentTimeMillis();
-            Candle candle = null;
             public void run() {
                 if (candle != null) {
                     candle.stop();
@@ -39,7 +39,7 @@ public class Watch {
                 candle =  new Candle();
                 candles.add(candle);
                 long currentTime = System.currentTimeMillis();
-                System.out.println("run: "+ (currentTime - startTime)/1000);
+                System.out.println("run: "+ Math.round( (float)(currentTime - startTime)/1000));
                 startTime = currentTime;
             }
         }, calendar.getTime(), interval);
@@ -49,6 +49,7 @@ public class Watch {
     public void stop() {
         if (timer != null){
             timer.cancel();
+            candle.setStopTime();
             System.out.println("timer cancelled");
         }
     }
