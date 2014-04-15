@@ -1,5 +1,7 @@
 package candle;
 
+import metatrader.MetaTraderService;
+
 /**
  * Created with IntelliJ IDEA.
  * User: bogdan.teut
@@ -11,11 +13,15 @@ public class Candle {
     public long stopTime;
     public long startTime;
     public final int TIME_UNIT = 60;
+    public double startPrice;
+    public double stopPrice;
+    private MetaTraderService metaTraderService;
 
     public Candle (){
         System.out.println("Candle start");
         startTime = System.currentTimeMillis();
-
+        metaTraderService = new MetaTraderService();
+        startPrice = metaTraderService.getPrice();
     }
 
     public void stop() {

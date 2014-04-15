@@ -51,6 +51,14 @@ public class WatchTests {
         Assert.assertEquals(TIME_UNIT, Math.round( (float)candle.lifeTime()/1000));
     }
 
+    @Test
+    public void testStarEndPrice (){
+        Candle candle = new Candle();
+        candle.stop();
+        Assert.assertEquals(candle.startPrice, 10.1034);
+        Assert.assertEquals(candle.stopPrice, 10.1040);
+    }
+
 //    @Test
 //    public void doATest(){
 //        long stopTime = 1397337720093L;
