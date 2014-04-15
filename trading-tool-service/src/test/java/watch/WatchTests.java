@@ -15,12 +15,12 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class WatchTests {
+    final int TIME_UNIT = 60;
 
     @Test
     public void checkCandlesCreationEveryMinute(){
         Watch watch = new Watch();
         watch.start();
-        final int TIME_UNIT = 60;
         try {
             Thread.currentThread().sleep(3 * TIME_UNIT * 1000);
         } catch (InterruptedException e) {
@@ -33,15 +33,22 @@ public class WatchTests {
         Assert.assertEquals(candles.size(), 3);
         Candle candle1 = candles.get(0);
         Assert.assertNotNull (candle1);
-        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle1.stopTime - candle1.startTime)/1000));
+        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle1.lifeTime())/1000));
         Candle candle2 = candles.get(1);
         Assert.assertNotNull (candle2);
-        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle2.stopTime - candle2.startTime)/1000));
+        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle2.lifeTime())/1000));
         Candle candle3 = candles.get(2);
         Assert.assertNotNull (candle3);
-        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle3.stopTime - candle3.startTime)/1000));
+        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle3.lifeTime())/1000));
 
 
+    }
+
+    @Test
+    public void testLifeTime (){
+        Candle candle = new Candle();
+        candle.setStopTime();
+        Assert.assertEquals(TIME_UNIT, Math.round( (float)candle.lifeTime()/1000));
     }
 
 //    @Test

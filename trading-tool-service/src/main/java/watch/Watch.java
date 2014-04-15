@@ -13,6 +13,7 @@ import java.util.*;
  */
 public class Watch {
 
+    public final int TIME_UNIT = 60;
     List<Candle> candles;
     Timer timer;
     Candle candle = null;
@@ -23,7 +24,7 @@ public class Watch {
 
     public void start() {
         System.out.println("watch start");
-        int interval = 60 * 1000; // 10 sec
+        int interval = TIME_UNIT * 1000; // 10 sec
         Calendar calendar = new GregorianCalendar();
         calendar.set(Calendar.SECOND, 0);
         calendar.add(Calendar.MINUTE, 1);

@@ -10,6 +10,7 @@ package candle;
 public class Candle {
     public long stopTime;
     public long startTime;
+    public final int TIME_UNIT = 60;
 
     public Candle (){
         System.out.println("Candle start");
@@ -23,6 +24,10 @@ public class Candle {
     }
 
     public void setStopTime() {
-        stopTime = startTime + 1000 * 60;
+        stopTime = startTime + 1000 * TIME_UNIT;
+    }
+
+    public long lifeTime() {
+        return stopTime-startTime;
     }
 }
