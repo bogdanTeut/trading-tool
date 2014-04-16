@@ -17,16 +17,19 @@ public class Candle {
     public double stopPrice;
     private MetaTraderService metaTraderService;
 
-    public Candle (){
+    public void start() {
         System.out.println("Candle start");
         startTime = System.currentTimeMillis();
-        metaTraderService = new MetaTraderService();
+        if (metaTraderService == null){
+            metaTraderService = new MetaTraderService();
+        }
         startPrice = metaTraderService.getPrice();
     }
 
     public void stop() {
         System.out.println("Candle stop");
         stopTime = System.currentTimeMillis();
+        stopPrice = metaTraderService.getPrice();
     }
 
     public void setStopTime() {
@@ -35,5 +38,9 @@ public class Candle {
 
     public long lifeTime() {
         return stopTime-startTime;
+    }
+
+    public void setMetaTraderService(MetaTraderService metaTraderService) {
+        this.metaTraderService = metaTraderService;
     }
 }

@@ -4,8 +4,7 @@ import candle.Candle;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.sql.Time;
-import java.util.*;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,7 +18,7 @@ public class WatchTests {
 
     @Test
     public void checkCandlesCreationEveryMinute(){
-        Watch watch = new Watch();
+        Watch watch =  new Watch();
         watch.start();
         try {
             Thread.currentThread().sleep(3 * TIME_UNIT * 1000);
@@ -44,25 +43,4 @@ public class WatchTests {
 
     }
 
-    @Test
-    public void testLifeTime (){
-        Candle candle = new Candle();
-        candle.setStopTime();
-        Assert.assertEquals(TIME_UNIT, Math.round( (float)candle.lifeTime()/1000));
-    }
-
-    @Test
-    public void testStarEndPrice (){
-        Candle candle = new Candle();
-        candle.stop();
-        Assert.assertEquals(candle.startPrice, 10.1034);
-        Assert.assertEquals(candle.stopPrice, 10.1040);
-    }
-
-//    @Test
-//    public void doATest(){
-//        long stopTime = 1397337720093L;
-//        long startTime = 1397337660094L;
-//        Math.round( (float)(stopTime - startTime)/1000);
-//    }
 }

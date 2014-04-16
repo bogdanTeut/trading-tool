@@ -1,6 +1,7 @@
 package watch;
 
 import candle.Candle;
+import metatrader.MetaTraderService;
 
 import java.util.*;
 
@@ -16,7 +17,7 @@ public class Watch {
     public final int TIME_UNIT = 60;
     List<Candle> candles;
     Timer timer;
-    Candle candle = null;
+    Candle candle;
 
     public Watch() {
         this.candles = new ArrayList<Candle>();
@@ -29,6 +30,7 @@ public class Watch {
         calendar.set(Calendar.SECOND, 0);
         calendar.add(Calendar.MINUTE, 1);
         //Date timeToRun = new Date(System.currentTimeMillis() + interval);
+        final MetaTraderService metaTraderService = new MetaTraderService();
         timer = new Timer();
 
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -38,9 +40,11 @@ public class Watch {
                     candle.stop();
                 }
                 candle =  new Candle();
+                candle.setMetaTraderService(metaTraderService);
+                candle.start();
                 candles.add(candle);
                 long currentTime = System.currentTimeMillis();
-                System.out.println("run: "+ Math.round( (float)(currentTime - startTime)/1000));
+                System.out.println("Watch thread is running after: "+ Math.round( (float)(currentTime - startTime)/1000));
                 startTime = currentTime;
             }
         }, calendar.getTime(), interval);
