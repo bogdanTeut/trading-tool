@@ -41,7 +41,6 @@ public class CandleTests {
 
     @Test
     public void testStarEndPrice (){
-
         given(metaTraderService.getPrice()).willReturn(10.1034, 10.1039);
 
         candle.start();
@@ -49,6 +48,26 @@ public class CandleTests {
 
         Assert.assertEquals(candle.startPrice, 10.1034);
         Assert.assertEquals(candle.stopPrice, 10.1039);
+    }
+
+    @Test
+    public void testBoolishOrBearish (){
+        given(metaTraderService.getPrice()).willReturn(10.1034, 10.1039, 10.1036, 10.1034, 10.1035, 10.1035);
+
+        candle.start();
+        candle.stop();
+
+        Assert.assertEquals(candle.type, CandleEnum.BULLISH);
+
+        candle.start();
+        candle.stop();
+
+        Assert.assertEquals(candle.type, CandleEnum.BEARISH);
+
+        candle.start();
+        candle.stop();
+
+        Assert.assertEquals(candle.type, CandleEnum.NEUTRAL);
     }
 
 

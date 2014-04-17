@@ -16,6 +16,7 @@ public class Candle {
     public double startPrice;
     public double stopPrice;
     private MetaTraderService metaTraderService;
+    public CandleEnum type;
 
     public void start() {
         System.out.println("Candle start");
@@ -30,6 +31,13 @@ public class Candle {
         System.out.println("Candle stop");
         stopTime = System.currentTimeMillis();
         stopPrice = metaTraderService.getPrice();
+        if (startPrice<stopPrice) {
+            type = CandleEnum.BULLISH;
+        }else if (startPrice>stopPrice){
+            type = CandleEnum.BEARISH;
+        }else {
+            type = CandleEnum.NEUTRAL;
+        }
     }
 
     public void setStopTime() {
