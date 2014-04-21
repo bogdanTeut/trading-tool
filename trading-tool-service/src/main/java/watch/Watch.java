@@ -4,6 +4,8 @@ import candle.Candle;
 import metatrader.MetaTraderService;
 
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,38 +26,50 @@ public class Watch {
     }
 
     public void start() {
-        System.out.println("watch start");
-        int interval = TIME_UNIT * 1000; // 10 sec
-        Calendar calendar = new GregorianCalendar();
-        calendar.set(Calendar.SECOND, 0);
-        calendar.add(Calendar.MINUTE, 1);
-        //Date timeToRun = new Date(System.currentTimeMillis() + interval);
-        final MetaTraderService metaTraderService = new MetaTraderService();
-        timer = new Timer();
+        System.out.println("watch start"); ScheduledExecutorService scheduledFuture;
+        scheduledFuture.schedul
 
-        timer.scheduleAtFixedRate(new TimerTask() {
+        timer = new Timer();
+        timer.scheduleAtFixedRate(createTimerThread(), firstRunTimeCalendar(), TIME_UNIT * 1000);
+    }
+
+    private TimerTask createTimerThread() {
+        return new TimerTask() {
             long startTime = System.currentTimeMillis();
+            MetaTraderService metaTraderService = new MetaTraderService();
+
+
             public void run() {
+                long currentTime = System.currentTimeMillis();
+                System.out.println("Watch thread is running after: "+ Math.round( (float)(currentTime - startTime)/1000));
+
+                //it is null only at the beginning
                 if (candle != null) {
-                    candle.stop();
+                    candle.stop(0);
                 }
+
                 candle =  new Candle();
                 candle.setMetaTraderService(metaTraderService);
                 candle.start();
+
                 candles.add(candle);
-                long currentTime = System.currentTimeMillis();
-                System.out.println("Watch thread is running after: "+ Math.round( (float)(currentTime - startTime)/1000));
                 startTime = currentTime;
             }
-        }, calendar.getTime(), interval);
+        };
+    }
 
+    private Date firstRunTimeCalendar() {
+        Calendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.SECOND, 0);
+        calendar.add(Calendar.MINUTE, 1);
+        return calendar.getTime();
     }
 
     public void stop() {
         if (timer != null){
-            timer.cancel();
-            candle.setStopTime();
             System.out.println("timer cancelled");
+            timer.cancel();
+            candle.stop(candle.getStopTime());
         }
     }
 

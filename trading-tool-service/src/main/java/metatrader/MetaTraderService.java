@@ -11,4 +11,8 @@ public class MetaTraderService {
     public double getPrice() {
         return 0;
     }
+
+    public double getPsar() {
+        return 0;
+    }
 }

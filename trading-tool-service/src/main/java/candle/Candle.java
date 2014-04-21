@@ -27,9 +27,13 @@ public class Candle {
         startPrice = metaTraderService.getPrice();
     }
 
-    public void stop() {
+    public void stop(long stopTime) {
         System.out.println("Candle stop");
-        stopTime = System.currentTimeMillis();
+        if (stopTime != 0){
+            this.stopTime = stopTime;
+        }else{
+            this.stopTime = System.currentTimeMillis();
+        }
         stopPrice = metaTraderService.getPrice();
         if (startPrice<stopPrice) {
             type = CandleEnum.BULLISH;
@@ -40,8 +44,8 @@ public class Candle {
         }
     }
 
-    public void setStopTime() {
-        stopTime = startTime + 1000 * TIME_UNIT;
+    public long getStopTime() {
+        return startTime + 1000 * TIME_UNIT;
     }
 
     public long lifeTime() {
