@@ -74,7 +74,7 @@ public class WatchTests {
     @Test
     public void checkMetatraderServiceCalledEveryFewMillSecs(){
 
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000)).getPsar();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getPsar();
     }
 
     private long timeInTermsOfMilliseconds() {

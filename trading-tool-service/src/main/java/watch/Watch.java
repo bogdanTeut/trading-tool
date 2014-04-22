@@ -31,20 +31,43 @@ public class Watch {
 
     public void start() {
         System.out.println("watch start");
-        scheduledFuture = Executors.newScheduledThreadPool(30);
+        scheduledFuture = Executors.newScheduledThreadPool(2);
         final Runnable indicatorsAnalyserTask =  new Runnable() {
             @Override
             public void run() {
-                System.out.println("Another run");
+                System.out.println(Thread.currentThread().getName());
                 metaTraderService.getPsar();
             }
         };
-        System.out.println("First run: " +  Math.round( (float)(firstRunTimeCalendar().getTime() - System.currentTimeMillis()))/1000 + " "+ (firstRunTimeCalendar().getTime() - System.currentTimeMillis()));
-        final ScheduledFuture<?> taskHandler = scheduledFuture.scheduleAtFixedRate(indicatorsAnalyserTask,
-                firstRunTimeCalendar().getTime() - System.currentTimeMillis(), 1000, TimeUnit.MILLISECONDS);
 
-        timer = new Timer();
-        timer.scheduleAtFixedRate(createTimerThread(), firstRunTimeCalendar(), TIME_UNIT * 1000);
+        final Runnable candleCreatorTask =  new Runnable() {
+            long startTime = System.currentTimeMillis();
+            @Override
+            public void run() {
+                long currentTime = System.currentTimeMillis();
+                System.out.println("Watch thread is running after: "+ Math.round( (float)(currentTime - startTime)/1000));
+                System.out.println(Thread.currentThread().getName());
+                //it is null only at the beginning
+                if (candle != null) {
+                    candle.stop(0);
+                }
+
+                candle =  new Candle();
+                candle.setMetaTraderService(metaTraderService);
+                candle.start();
+
+                candles.add(candle);
+                startTime = currentTime;
+            }
+        };
+
+        final ScheduledFuture<?> indicatorsTaskHandler = scheduledFuture.scheduleAtFixedRate(indicatorsAnalyserTask,
+                firstRunTimeCalendar().getTime() - System.currentTimeMillis(), 1000, TimeUnit.MILLISECONDS);
+        final ScheduledFuture<?> candlesTaskHandler = scheduledFuture.scheduleAtFixedRate(candleCreatorTask,
+                firstRunTimeCalendar().getTime() - System.currentTimeMillis(), TIME_UNIT * 1000, TimeUnit.MILLISECONDS);
+//
+//        timer = new Timer();
+//        timer.scheduleAtFixedRate(createTimerThread(), firstRunTimeCalendar(), TIME_UNIT * 1000);
     }
 
     private TimerTask createTimerThread() {
@@ -55,7 +78,7 @@ public class Watch {
             public void run() {
                 long currentTime = System.currentTimeMillis();
                 System.out.println("Watch thread is running after: "+ Math.round( (float)(currentTime - startTime)/1000));
-
+                System.out.println(Thread.currentThread().getName());
                 //it is null only at the beginning
                 if (candle != null) {
                     candle.stop(0);
@@ -79,13 +102,13 @@ public class Watch {
     }
 
     public void stop() {
-        if (timer != null){
-            System.out.println("timer cancelled");
-            timer.cancel();
+        //if (timer != null){
+            //System.out.println("timer cancelled");
+            //timer.cancel();
             if (candle != null){
                 candle.stop(candle.getStopTime());
             }
-        }
+        //}
         scheduledFuture.shutdown();
     }
 
