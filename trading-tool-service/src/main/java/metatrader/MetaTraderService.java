@@ -15,4 +15,12 @@ public class MetaTraderService {
     public double getPsar() {
         return 0;
     }
+
+    public double getAdx() {
+        return 0;
+    }
+
+    public double getRsi() {
+        return 0;
+    }
 }

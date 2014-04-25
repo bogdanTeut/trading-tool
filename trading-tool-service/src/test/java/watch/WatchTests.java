@@ -40,6 +40,8 @@ public class WatchTests {
     public void setUp(){
         MockitoAnnotations.initMocks(this);
 
+        given(metaTraderService.getPsar()).willReturn(10.1039, 10.1036, 10.1035);
+
         watch.start();
         try {
             Thread.currentThread().sleep(3 * TIME_UNIT * 1000);
@@ -59,22 +61,25 @@ public class WatchTests {
         Candle candle1 = candles.get(0);
         Assert.assertNotNull (candle1);
         Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle1.lifeTime())/1000));
+        Assert.assertEquals(candle1.getPsar(), 10.1039);
 
         Candle candle2 = candles.get(1);
         Assert.assertNotNull (candle2);
         Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle2.lifeTime())/1000));
+        Assert.assertEquals(candle2.getPsar(), 10.1036);
 
         Candle candle3 = candles.get(2);
         Assert.assertNotNull (candle3);
         Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle3.lifeTime())/1000));
-
+        Assert.assertEquals(candle3.getPsar(), 10.1035);
 
     }
 
     @Test
     public void checkMetatraderServiceCalledEveryFewMillSecs(){
 
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getPsar();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000)).getAdx();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000)).getRsi();
     }
 
     private long timeInTermsOfMilliseconds() {

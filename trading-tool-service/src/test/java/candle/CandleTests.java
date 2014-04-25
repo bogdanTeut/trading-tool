@@ -7,6 +7,9 @@ import org.mockito.MockitoAnnotations;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import watch.Watch;
+
+import java.util.ArrayList;
 
 import static org.mockito.BDDMockito.given;
 
@@ -108,6 +111,32 @@ public class CandleTests {
         candle.startTime = startTime;
 
         Assert.assertEquals(startTime + 1000 * TIME_UNIT, candle.getStopTime());
+    }
+
+    @Test
+     public void testGetPsar (){
+        given(metaTraderService.getPsar()).willReturn(10.1034);
+        candle.start();
+        candle.stop(0);
+
+        Assert.assertEquals(candle.getPsar(), 10.1034);
+    }
+
+    @Test
+    public void testGetPsarRevertEvent(){
+        given(metaTraderService.getPsar()).willReturn(10.1020);
+
+        Candle prevCandle = new Candle(null);
+        prevCandle.setPsar (10.1034);
+        candle.getWatch() = new Watch();
+        .candles() = new ArrayList<Candle>();
+        .add(prevCandle);
+
+        candle.start();
+        candle.stop(0);
+
+        Assert.assertEquals(candle.isPsarEventRevert(), true);
+
     }
 
 

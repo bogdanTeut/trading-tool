@@ -36,7 +36,8 @@ public class Watch {
             @Override
             public void run() {
                 System.out.println(Thread.currentThread().getName());
-                metaTraderService.getPsar();
+                metaTraderService.getAdx();
+                metaTraderService.getRsi();
             }
         };
 
@@ -52,7 +53,7 @@ public class Watch {
                     candle.stop(0);
                 }
 
-                candle =  new Candle();
+                candle =  new Candle(Watch.this);
                 candle.setMetaTraderService(metaTraderService);
                 candle.start();
 
@@ -65,33 +66,7 @@ public class Watch {
                 firstRunTimeCalendar().getTime() - System.currentTimeMillis(), 1000, TimeUnit.MILLISECONDS);
         final ScheduledFuture<?> candlesTaskHandler = scheduledFuture.scheduleAtFixedRate(candleCreatorTask,
                 firstRunTimeCalendar().getTime() - System.currentTimeMillis(), TIME_UNIT * 1000, TimeUnit.MILLISECONDS);
-//
-//        timer = new Timer();
-//        timer.scheduleAtFixedRate(createTimerThread(), firstRunTimeCalendar(), TIME_UNIT * 1000);
-    }
 
-    private TimerTask createTimerThread() {
-        return new TimerTask() {
-            long startTime = System.currentTimeMillis();
-
-
-            public void run() {
-                long currentTime = System.currentTimeMillis();
-                System.out.println("Watch thread is running after: "+ Math.round( (float)(currentTime - startTime)/1000));
-                System.out.println(Thread.currentThread().getName());
-                //it is null only at the beginning
-                if (candle != null) {
-                    candle.stop(0);
-                }
-
-                candle =  new Candle();
-                candle.setMetaTraderService(metaTraderService);
-                candle.start();
-
-                candles.add(candle);
-                startTime = currentTime;
-            }
-        };
     }
 
     private Date firstRunTimeCalendar() {
@@ -102,13 +77,9 @@ public class Watch {
     }
 
     public void stop() {
-        //if (timer != null){
-            //System.out.println("timer cancelled");
-            //timer.cancel();
             if (candle != null){
                 candle.stop(candle.getStopTime());
             }
-        //}
         scheduledFuture.shutdown();
     }
 

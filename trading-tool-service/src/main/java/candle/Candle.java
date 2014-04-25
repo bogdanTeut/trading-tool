@@ -1,6 +1,9 @@
 package candle;
 
 import metatrader.MetaTraderService;
+import watch.Watch;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,6 +20,13 @@ public class Candle {
     public double stopPrice;
     private MetaTraderService metaTraderService;
     public CandleEnum type;
+    private double psar;
+    private boolean psarEventRevert;
+    private Watch watch;
+
+    public Candle(Watch watch) {
+        this.watch = watch;
+    }
 
     public void start() {
         System.out.println("Candle start");
@@ -42,6 +52,8 @@ public class Candle {
         }else {
             type = CandleEnum.NEUTRAL;
         }
+        psar = metaTraderService.getPsar();
+        psarEventRevert = calculatePsarEventRevert();
     }
 
     public long getStopTime() {
@@ -54,5 +66,40 @@ public class Candle {
 
     public void setMetaTraderService(MetaTraderService metaTraderService) {
         this.metaTraderService = metaTraderService;
+    }
+
+    public double getPsar() {
+        return psar;
+    }
+
+    public boolean calculatePsarEventRevert() {
+        boolean result = false;
+        List<Candle> candles = watch.candles();
+        Candle prevCandle = candles.get(candles.size()-1);
+        if (psar != 0){
+            if (this.type.equals(CandleEnum.BULLISH) && prevCandle.type.equals(CandleEnum.BEARISH)){
+                if (prevCandle.getPsar() - this.getPsar() > 0.0010){
+                    result = true;
+                }
+            };
+        }
+
+        return result;
+    }
+
+    public boolean isPsarEventRevert() {
+        return psarEventRevert;
+    }
+
+    public Watch getWatch() {
+        return watch;
+    }
+
+    public void setWatch(Watch watch) {
+        this.watch = watch;
+    }
+
+    public void setPsar(double psar) {
+        this.psar = psar;
     }
 }
