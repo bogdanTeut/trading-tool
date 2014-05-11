@@ -5,10 +5,8 @@ import metatrader.MetaTraderService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.verification.VerificationMode;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
@@ -74,12 +72,32 @@ public class WatchTests {
         Assert.assertEquals(candle3.getPsar(), 10.1035);
 
     }
+    //TO DO this test duplicates checkDoAlgorithm test. It should be deleted at some point
+    @Test
+    public void checkDoAlgorithmGettingCalledEveryFewMillSecs(){
+
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getAdx();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getRsi();
+    }
 
     @Test
-    public void checkMetatraderServiceCalledEveryFewMillSecs(){
+    public void checkFirstTimeRunCalendar(){
+        Watch watch = new Watch();
+        Calendar now =  new GregorianCalendar();
+        now.set(Calendar.SECOND, 0);
+        now.add(Calendar.MINUTE, 1);
 
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000)).getAdx();
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000)).getRsi();
+        Assert.assertEquals(watch.firstRunTimeCalendar(), now.getTime());
+    }
+
+    @Test
+    public void checkDoAlgorithm(){
+        Watch watch =  new Watch();
+        watch.setMetaTraderService(metaTraderService);
+        watch.doAlgorithm();
+
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getAdx();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getRsi();
     }
 
     private long timeInTermsOfMilliseconds() {

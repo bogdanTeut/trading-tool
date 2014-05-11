@@ -1,12 +1,14 @@
 package candle;
 
+import junit.framework.Assert;
 import metatrader.MetaTraderService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.testng.AssertJUnit;
+import org.testng.collections.Lists;
 import watch.Watch;
 
 import java.util.ArrayList;
@@ -26,22 +28,29 @@ public class CandleTests {
     @Mock
     MetaTraderService metaTraderService;
 
+    @Mock
+    Watch watch;
+
     @InjectMocks
     private Candle candle;
 
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+//        Candle prevCandle = new Candle();
+//        prevCandle.setPsar(10.1034);
+//        prevCandle.setType(CandleEnum.BEARISH);
+//        given(watch.candles()).willReturn(Lists.newArrayList(prevCandle));
     }
 
     @Test
-    public void testStart (){
+    public void testStartTime (){
 
         given(metaTraderService.getPrice()).willReturn(10.1034);
         candle.start();
 
-        Assert.assertEquals(10.1034, candle.startPrice);
-        Assert.assertEquals(System.currentTimeMillis(), candle.startTime);
+        //AssertJUnit.assertEquals(10.1034, candle.startPrice);
+        AssertJUnit.assertEquals(System.currentTimeMillis(), candle.startTime);
     }
 
     @Test
@@ -51,30 +60,34 @@ public class CandleTests {
         candle.start();
         candle.stop(0);
 
-        Assert.assertEquals(candle.startPrice, 10.1034);
-        Assert.assertEquals(candle.stopPrice, 10.1039);
+        AssertJUnit.assertEquals(candle.startPrice, 10.1034);
+        AssertJUnit.assertEquals(candle.stopPrice, 10.1039);
     }
 
     @Test
-    public void testStopWithParameter (){
+    public void testStopTimeWithParameter (){
+        given(metaTraderService.getPrice()).willReturn(10.1034, 10.1039);
         long stopTime = candle.getStopTime();
 
         candle.start();
         candle.stop(stopTime);
 
-        Assert.assertTrue(candle.startTime != 0);
-        Assert.assertTrue(candle.stopTime != 0);
-        Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle.lifeTime())/1000));
+        //AssertJUnit.assertTrue(candle.startTime != 0);
+        AssertJUnit.assertTrue(candle.stopTime != 0);
+        //AssertJUnit.assertEquals(candle.stopPrice, 10.1039);
+        AssertJUnit.assertEquals(TIME_UNIT, Math.round( (float)(candle.lifeTime())/1000));
     }
 
     @Test
-    public void testStopWithoutParameter (){
+    public void testStopTimeWithoutParameter (){
+        given(metaTraderService.getPrice()).willReturn(10.1034, 10.1039);
         candle.start();
         candle.stop(0);
 
-        Assert.assertTrue(candle.startTime != 0);
-        Assert.assertTrue(candle.stopTime != 0);
-        Assert.assertEquals(0, Math.round( (float)(candle.lifeTime())/1000));
+        //AssertJUnit.assertTrue(candle.startTime != 0);
+        AssertJUnit.assertTrue(candle.stopTime != 0);
+        //AssertJUnit.assertEquals(candle.stopPrice, 10.1039);
+        AssertJUnit.assertEquals(0, Math.round( (float)(candle.lifeTime())/1000));
     }
 
     @Test
@@ -83,15 +96,15 @@ public class CandleTests {
 
         candle.start();
         candle.stop(0);
-        Assert.assertEquals(candle.type, CandleEnum.BULLISH);
+        AssertJUnit.assertEquals(candle.type, CandleEnum.BULLISH);
 
         candle.start();
         candle.stop(0);
-        Assert.assertEquals(candle.type, CandleEnum.BEARISH);
+        AssertJUnit.assertEquals(candle.type, CandleEnum.BEARISH);
 
         candle.start();
         candle.stop(0);
-        Assert.assertEquals(candle.type, CandleEnum.NEUTRAL);
+        AssertJUnit.assertEquals(candle.type, CandleEnum.NEUTRAL);
     }
 
     @Test
@@ -101,7 +114,7 @@ public class CandleTests {
         candle.startTime = startTime;
         candle.stopTime = stopTime;
 
-        Assert.assertEquals(50, Math.round((float) candle.lifeTime() / 1000));
+        AssertJUnit.assertEquals(50, Math.round((float) candle.lifeTime() / 1000));
     }
 
     @Test
@@ -110,7 +123,7 @@ public class CandleTests {
         candle.start();
         candle.startTime = startTime;
 
-        Assert.assertEquals(startTime + 1000 * TIME_UNIT, candle.getStopTime());
+        AssertJUnit.assertEquals(startTime + 1000 * TIME_UNIT, candle.getStopTime());
     }
 
     @Test
@@ -119,24 +132,39 @@ public class CandleTests {
         candle.start();
         candle.stop(0);
 
-        Assert.assertEquals(candle.getPsar(), 10.1034);
+        AssertJUnit.assertEquals(candle.getPsar(), 10.1034);
     }
 
     @Test
     public void testGetPsarRevertEvent(){
-        given(metaTraderService.getPsar()).willReturn(10.1020);
+//        given(metaTraderService.getPsar()).willReturn(10.1020);
+//        given(metaTraderService.getPrice()).willReturn(10.1032, 10.1036);
 
-        Candle prevCandle = new Candle(null);
-        prevCandle.setPsar (10.1034);
-        candle.getWatch() = new Watch();
-        .candles() = new ArrayList<Candle>();
-        .add(prevCandle);
+        candle.setStopPrice(10.1050);
+        candle.setType(CandleEnum.BULLISH);
 
-        candle.start();
-        candle.stop(0);
+        Candle prevCandle = createCandle(CandleEnum.BEARISH);
+        given(watch.candles()).willReturn(Lists.newArrayList(prevCandle));
 
-        Assert.assertEquals(candle.isPsarEventRevert(), true);
+        AssertJUnit.assertEquals(candle.calculatePsarEventRevert(), true);
 
+
+
+        candle.setStopPrice(10.1020);
+        candle.setType(CandleEnum.BEARISH);
+
+        prevCandle = createCandle(CandleEnum.BULLISH);
+        given(watch.candles()).willReturn(Lists.newArrayList(prevCandle));
+
+        AssertJUnit.assertEquals(candle.calculatePsarEventRevert(), true);
+
+    }
+
+    private Candle createCandle(CandleEnum candleType) {
+        Candle prevCandle = new Candle();
+        prevCandle.setPsar(10.1034);
+        prevCandle.setType(candleType);
+        return prevCandle;
     }
 
 

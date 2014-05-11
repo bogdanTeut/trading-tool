@@ -24,8 +24,7 @@ public class Candle {
     private boolean psarEventRevert;
     private Watch watch;
 
-    public Candle(Watch watch) {
-        this.watch = watch;
+    public Candle() {
     }
 
     public void start() {
@@ -75,13 +74,20 @@ public class Candle {
     public boolean calculatePsarEventRevert() {
         boolean result = false;
         List<Candle> candles = watch.candles();
-        Candle prevCandle = candles.get(candles.size()-1);
-        if (psar != 0){
-            if (this.type.equals(CandleEnum.BULLISH) && prevCandle.type.equals(CandleEnum.BEARISH)){
-                if (prevCandle.getPsar() - this.getPsar() > 0.0010){
-                    result = true;
-                }
-            };
+        if (candles.size()!=0){
+            Candle prevCandle = candles.get(candles.size()-1);
+            if (stopPrice != 0){
+                if (this.type.equals(CandleEnum.BULLISH) && prevCandle.type.equals(CandleEnum.BEARISH)){
+                    if (this.stopPrice - prevCandle.getPsar() > 0.0010){
+                        result = true;
+                    }
+                };
+                if (this.type.equals(CandleEnum.BEARISH) && prevCandle.type.equals(CandleEnum.BULLISH)){
+                    if (prevCandle.getPsar() - this.stopPrice > 0.0010){
+                        result = true;
+                    }
+                };
+            }
         }
 
         return result;
@@ -102,4 +108,13 @@ public class Candle {
     public void setPsar(double psar) {
         this.psar = psar;
     }
+
+    public void setType(CandleEnum type) {
+        this.type = type;
+    }
+
+    public void setStopPrice(double stopPrice) {
+        this.stopPrice = stopPrice;
+    }
 }
+

@@ -36,9 +36,9 @@ public class Watch {
             @Override
             public void run() {
                 System.out.println(Thread.currentThread().getName());
-                metaTraderService.getAdx();
-                metaTraderService.getRsi();
+                doAlgorithm();
             }
+
         };
 
         final Runnable candleCreatorTask =  new Runnable() {
@@ -53,7 +53,8 @@ public class Watch {
                     candle.stop(0);
                 }
 
-                candle =  new Candle(Watch.this);
+                candle =  new Candle();
+                candle.setWatch(Watch.this);
                 candle.setMetaTraderService(metaTraderService);
                 candle.start();
 
@@ -69,7 +70,12 @@ public class Watch {
 
     }
 
-    private Date firstRunTimeCalendar() {
+    protected void doAlgorithm() {
+        metaTraderService.getAdx();
+        metaTraderService.getRsi();
+    }
+
+    protected Date firstRunTimeCalendar() {
         Calendar calendar = new GregorianCalendar();
         calendar.set(Calendar.SECOND, 0);
         calendar.add(Calendar.MINUTE, 1);
