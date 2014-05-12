@@ -73,6 +73,7 @@ public class Watch {
     protected void doAlgorithm() {
         metaTraderService.getAdx();
         metaTraderService.getRsi();
+        metaTraderService.doOrder();
     }
 
     protected Date firstRunTimeCalendar() {

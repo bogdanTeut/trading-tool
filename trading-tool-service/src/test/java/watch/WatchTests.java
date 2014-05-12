@@ -76,8 +76,8 @@ public class WatchTests {
     @Test
     public void checkDoAlgorithmGettingCalledEveryFewMillSecs(){
 
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getAdx();
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getRsi();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+2)).getAdx();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+2)).getRsi();
     }
 
     @Test
@@ -96,8 +96,7 @@ public class WatchTests {
         watch.setMetaTraderService(metaTraderService);
         watch.doAlgorithm();
 
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getAdx();
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+1)).getRsi();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+2)).doOrder();
     }
 
     private long timeInTermsOfMilliseconds() {

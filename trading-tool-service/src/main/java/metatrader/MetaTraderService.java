@@ -23,4 +23,8 @@ public class MetaTraderService {
     public double getRsi() {
         return 0;
     }
+
+    public void doOrder() {
+        //To change body of created methods use File | Settings | File Templates.
+    }
 }
