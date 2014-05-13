@@ -73,7 +73,11 @@ public class Watch {
     protected void doAlgorithm() {
         metaTraderService.getAdx();
         metaTraderService.getRsi();
-        metaTraderService.doOrder();
+        if (candles().size() == 0) return;
+
+        if (candles.get(candles.size()-1).isPsarEventRevert()){
+            metaTraderService.doOrder();
+        }
     }
 
     protected Date firstRunTimeCalendar() {

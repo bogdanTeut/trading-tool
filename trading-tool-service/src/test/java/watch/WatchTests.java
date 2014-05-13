@@ -15,8 +15,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -76,8 +76,8 @@ public class WatchTests {
     @Test
     public void checkDoAlgorithmGettingCalledEveryFewMillSecs(){
 
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+2)).getAdx();
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+2)).getRsi();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000)).getAdx();
+        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000)).getRsi();
     }
 
     @Test
@@ -91,13 +91,41 @@ public class WatchTests {
     }
 
     @Test
-    public void checkDoAlgorithm(){
+    public void checkDoAlgorithmNoPsarEventRevert(){
         Watch watch =  new Watch();
         watch.setMetaTraderService(metaTraderService);
+
+        List<Candle> candles = watch.candles();
+        Candle candle = new Candle();
+        candle.setMetaTraderService(metaTraderService);
+        candles.add(candle);
+
         watch.doAlgorithm();
 
-        verify(metaTraderService, times((int)timeInTermsOfMilliseconds()/1000+2)).doOrder();
+        Candle prevCandle = candles.get(candles.size()-1);
+
+        verify(metaTraderService, never()).doOrder();
     }
+
+    @Test
+    public void checkDoAlgorithmPsarEventReversed(){
+        Watch watch =  new Watch();
+        watch.setMetaTraderService(metaTraderService);
+
+        List<Candle> candles = watch.candles();
+        Candle candle = new Candle();
+        candle.setMetaTraderService(metaTraderService);
+        candle.setPsarEventRevert(true);
+        candles.add(candle);
+
+        watch.doAlgorithm();
+
+        Candle prevCandle = candles.get(candles.size()-1);
+
+        verify(metaTraderService, atLeastOnce()).doOrder();
+    }
+
+
 
     private long timeInTermsOfMilliseconds() {
         Calendar calendar = new GregorianCalendar();

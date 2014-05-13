@@ -97,6 +97,10 @@ public class Candle {
         return psarEventRevert;
     }
 
+    public void setPsarEventRevert(boolean psarEventRevert) {
+        this.psarEventRevert = psarEventRevert;
+    }
+
     public Watch getWatch() {
         return watch;
     }
