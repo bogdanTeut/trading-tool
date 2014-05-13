@@ -160,6 +160,16 @@ public class CandleTests {
 
     }
 
+    @Test
+    public void testGetAdxRevertEvent(){
+
+        Candle beforePrevCandle = new Candle();
+        beforePrevCandle.setAdxIndicator(new AdxIndicator());
+
+        Candle prevCandle = new Candle();
+        prevCandle.setAdxIndicator(new AdxIndicator());
+    }
+
     private Candle createCandle(CandleEnum candleType) {
         Candle prevCandle = new Candle();
         prevCandle.setPsar(10.1034);
