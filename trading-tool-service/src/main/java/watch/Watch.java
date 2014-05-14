@@ -75,8 +75,10 @@ public class Watch {
         metaTraderService.getRsi();
         if (candles().size() == 0) return;
 
-        if (candles.get(candles.size()-1).isPsarEventRevert()){
-            metaTraderService.doOrder();
+        if (candles.get(candles.size()-1).isPsarReverseEvent()){
+            if (candles.get(candles.size()-1).isAdxReverseEvent()){
+                metaTraderService.doOrder();
+            }
         }
     }
 

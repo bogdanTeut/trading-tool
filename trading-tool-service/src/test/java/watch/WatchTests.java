@@ -10,7 +10,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -91,7 +90,7 @@ public class WatchTests {
     }
 
     @Test
-    public void checkDoAlgorithmNoPsarEventRevert(){
+    public void checkDoAlgorithmNoPsarReverseEvent(){
         Watch watch =  new Watch();
         watch.setMetaTraderService(metaTraderService);
 
@@ -108,14 +107,33 @@ public class WatchTests {
     }
 
     @Test
-    public void checkDoAlgorithmPsarEventReversed(){
+    public void checkDoAlgorithmPsarReverseEventNoAdxReverseEvent(){
         Watch watch =  new Watch();
         watch.setMetaTraderService(metaTraderService);
 
         List<Candle> candles = watch.candles();
         Candle candle = new Candle();
         candle.setMetaTraderService(metaTraderService);
-        candle.setPsarEventRevert(true);
+        candle.setPsarReverseEvent(true);
+        candles.add(candle);
+
+        watch.doAlgorithm();
+
+        Candle prevCandle = candles.get(candles.size()-1);
+
+        verify(metaTraderService, never()).doOrder();
+    }
+
+    @Test
+    public void checkDoAlgorithmPsarReverseEventAdxReverseEvent(){
+        Watch watch =  new Watch();
+        watch.setMetaTraderService(metaTraderService);
+
+        List<Candle> candles = watch.candles();
+        Candle candle = new Candle();
+        candle.setMetaTraderService(metaTraderService);
+        candle.setPsarReverseEvent(true);
+        candle.setAdxReverseEvent(true);
         candles.add(candle);
 
         watch.doAlgorithm();

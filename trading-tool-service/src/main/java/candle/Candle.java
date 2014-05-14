@@ -1,5 +1,6 @@
 package candle;
 
+import indicators.AdxIndicator;
 import metatrader.MetaTraderService;
 import watch.Watch;
 
@@ -21,8 +22,10 @@ public class Candle {
     private MetaTraderService metaTraderService;
     public CandleEnum type;
     private double psar;
-    private boolean psarEventRevert;
+    private boolean psarReverseEvent;
     private Watch watch;
+    private AdxIndicator adxIndicator;
+    private boolean adxReverseEvent;
 
     public Candle() {
     }
@@ -52,7 +55,7 @@ public class Candle {
             type = CandleEnum.NEUTRAL;
         }
         psar = metaTraderService.getPsar();
-        psarEventRevert = calculatePsarEventRevert();
+        psarReverseEvent = calculatePsarReverseEvent();
     }
 
     public long getStopTime() {
@@ -71,7 +74,7 @@ public class Candle {
         return psar;
     }
 
-    public boolean calculatePsarEventRevert() {
+    public boolean calculatePsarReverseEvent() {
         boolean result = false;
         List<Candle> candles = watch.candles();
         if (candles.size()!=0){
@@ -93,12 +96,12 @@ public class Candle {
         return result;
     }
 
-    public boolean isPsarEventRevert() {
-        return psarEventRevert;
+    public boolean isPsarReverseEvent() {
+        return psarReverseEvent;
     }
 
-    public void setPsarEventRevert(boolean psarEventRevert) {
-        this.psarEventRevert = psarEventRevert;
+    public void setPsarReverseEvent(boolean psarReverseEvent) {
+        this.psarReverseEvent = psarReverseEvent;
     }
 
     public Watch getWatch() {
@@ -119,6 +122,38 @@ public class Candle {
 
     public void setStopPrice(double stopPrice) {
         this.stopPrice = stopPrice;
+    }
+
+    public void setAdxIndicator(AdxIndicator adxIndicator) {
+        this.adxIndicator = adxIndicator;
+    }
+
+    public AdxIndicator getAdxIndicator() {
+        return adxIndicator;
+    }
+
+    public boolean calculateAdxReverseEvent() {
+        List<Candle> candleList = watch.candles();
+        AdxIndicator beforePrevCandleAdx = candleList.get(candleList.size()-2).getAdxIndicator();
+        AdxIndicator prevCandleAdx = candleList.get(candleList.size()-1).getAdxIndicator();
+
+        if (beforePrevCandleAdx.getNegativeDirectionalMovementIndicator() < prevCandleAdx.getNegativeDirectionalMovementIndicator()
+            && beforePrevCandleAdx.getPositiveDirectionalMovementIndicator() > prevCandleAdx.getPositiveDirectionalMovementIndicator())
+            return true;
+
+        if (beforePrevCandleAdx.getNegativeDirectionalMovementIndicator() > prevCandleAdx.getNegativeDirectionalMovementIndicator()
+                && beforePrevCandleAdx.getPositiveDirectionalMovementIndicator() < prevCandleAdx.getPositiveDirectionalMovementIndicator())
+            return true;
+
+        return false;
+    }
+
+    public void setAdxReverseEvent(boolean adxReverseEvent) {
+        this.adxReverseEvent = adxReverseEvent;
+    }
+
+    public boolean isAdxReverseEvent() {
+        return adxReverseEvent;
     }
 }
 

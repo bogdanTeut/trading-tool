@@ -1,6 +1,6 @@
 package candle;
 
-import junit.framework.Assert;
+import indicators.AdxIndicator;
 import metatrader.MetaTraderService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -10,8 +10,6 @@ import org.testng.annotations.Test;
 import org.testng.AssertJUnit;
 import org.testng.collections.Lists;
 import watch.Watch;
-
-import java.util.ArrayList;
 
 import static org.mockito.BDDMockito.given;
 
@@ -136,7 +134,7 @@ public class CandleTests {
     }
 
     @Test
-    public void testGetPsarRevertEvent(){
+    public void testGetPsarReverseEvent(){
 //        given(metaTraderService.getPsar()).willReturn(10.1020);
 //        given(metaTraderService.getPrice()).willReturn(10.1032, 10.1036);
 
@@ -146,7 +144,7 @@ public class CandleTests {
         Candle prevCandle = createCandle(CandleEnum.BEARISH);
         given(watch.candles()).willReturn(Lists.newArrayList(prevCandle));
 
-        AssertJUnit.assertEquals(candle.calculatePsarEventRevert(), true);
+        AssertJUnit.assertEquals(candle.calculatePsarReverseEvent(), true);
 
 
 
@@ -156,7 +154,7 @@ public class CandleTests {
         prevCandle = createCandle(CandleEnum.BULLISH);
         given(watch.candles()).willReturn(Lists.newArrayList(prevCandle));
 
-        AssertJUnit.assertEquals(candle.calculatePsarEventRevert(), true);
+        AssertJUnit.assertEquals(candle.calculatePsarReverseEvent(), true);
 
     }
 
@@ -164,10 +162,26 @@ public class CandleTests {
     public void testGetAdxRevertEvent(){
 
         Candle beforePrevCandle = new Candle();
-        beforePrevCandle.setAdxIndicator(new AdxIndicator());
+        beforePrevCandle.setAdxIndicator(new AdxIndicator(20, 30, 25));
 
         Candle prevCandle = new Candle();
-        prevCandle.setAdxIndicator(new AdxIndicator());
+        prevCandle.setAdxIndicator(new AdxIndicator(30, 20, 25));
+
+        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
+
+        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
+
+
+        beforePrevCandle = new Candle();
+        beforePrevCandle.setAdxIndicator(new AdxIndicator(31, 21, 25));
+
+        prevCandle = new Candle();
+        prevCandle.setAdxIndicator(new AdxIndicator(21, 31, 25));
+
+        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
+
+        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
+
     }
 
     private Candle createCandle(CandleEnum candleType) {
