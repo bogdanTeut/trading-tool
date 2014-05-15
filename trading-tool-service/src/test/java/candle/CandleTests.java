@@ -35,10 +35,6 @@ public class CandleTests {
     @BeforeMethod
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-//        Candle prevCandle = new Candle();
-//        prevCandle.setPsar(10.1034);
-//        prevCandle.setType(CandleEnum.BEARISH);
-//        given(watch.candles()).willReturn(Lists.newArrayList(prevCandle));
     }
 
     @Test
@@ -52,7 +48,7 @@ public class CandleTests {
     }
 
     @Test
-    public void testStartEndPrice (){
+    public void testStartStopPrice (){
         given(metaTraderService.getPrice()).willReturn(10.1034, 10.1039);
 
         candle.start();

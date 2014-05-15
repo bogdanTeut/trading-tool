@@ -26,6 +26,7 @@ public class Candle {
     private Watch watch;
     private AdxIndicator adxIndicator;
     private boolean adxReverseEvent;
+    private boolean rsiEvent;
 
     public Candle() {
     }
@@ -154,6 +155,18 @@ public class Candle {
 
     public boolean isAdxReverseEvent() {
         return adxReverseEvent;
+    }
+
+    public double getStartPrice() {
+        return startPrice;
+    }
+
+    public boolean isRsiEvent() {
+        return rsiEvent;
+    }
+
+    public void setRsiEvent(boolean rsiEvent) {
+        this.rsiEvent = rsiEvent;
     }
 }
 

@@ -4,6 +4,7 @@ import candle.Candle;
 import metatrader.MetaTraderService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -38,6 +39,7 @@ public class WatchTests {
         MockitoAnnotations.initMocks(this);
 
         given(metaTraderService.getPsar()).willReturn(10.1039, 10.1036, 10.1035);
+        given(metaTraderService.getPrice()).willReturn(10.1041, 10.1041, 10.1042, 10.1042, 10.1043, 10.1043);
 
         watch.start();
         try {
@@ -59,16 +61,19 @@ public class WatchTests {
         Assert.assertNotNull (candle1);
         Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle1.lifeTime())/1000));
         Assert.assertEquals(candle1.getPsar(), 10.1039);
+        Assert.assertEquals(candle1.getStartPrice(), 10.1041);
 
         Candle candle2 = candles.get(1);
         Assert.assertNotNull (candle2);
         Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle2.lifeTime())/1000));
         Assert.assertEquals(candle2.getPsar(), 10.1036);
+        Assert.assertEquals(candle2.getStartPrice(), 10.1042);
 
         Candle candle3 = candles.get(2);
         Assert.assertNotNull (candle3);
         Assert.assertEquals(TIME_UNIT, Math.round( (float)(candle3.lifeTime())/1000));
         Assert.assertEquals(candle3.getPsar(), 10.1035);
+        Assert.assertEquals(candle3.getStartPrice(), 10.1043);
 
     }
     //TO DO this test duplicates checkDoAlgorithm test. It should be deleted at some point
@@ -115,6 +120,7 @@ public class WatchTests {
         Candle candle = new Candle();
         candle.setMetaTraderService(metaTraderService);
         candle.setPsarReverseEvent(true);
+        candle.setAdxReverseEvent(false);
         candles.add(candle);
 
         watch.doAlgorithm();
@@ -141,6 +147,28 @@ public class WatchTests {
         Candle prevCandle = candles.get(candles.size()-1);
 
         verify(metaTraderService, atLeastOnce()).doOrder();
+        Mockito.reset(metaTraderService);
+    }
+
+    @Test
+    public void checkDoAlgorithPsarEventAdxReverseEventNoRsiEvent(){
+        Watch watch =  new Watch();
+        watch.setMetaTraderService(metaTraderService);
+
+        List<Candle> candles = watch.candles();
+        Candle candle = new Candle();
+        candle.setMetaTraderService(metaTraderService);
+        candle.setPsarReverseEvent(true);
+        candle.setAdxReverseEvent(true);
+        candle.setRsiEvent(false);
+        candles.add(candle);
+
+        watch.doAlgorithm();
+
+        Candle prevCandle = candles.get(candles.size()-1);
+
+        verify(metaTraderService, never()).doOrder();
+        //Mockito.reset(metaTraderService);
     }
 
 

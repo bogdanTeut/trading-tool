@@ -77,7 +77,9 @@ public class Watch {
 
         if (candles.get(candles.size()-1).isPsarReverseEvent()){
             if (candles.get(candles.size()-1).isAdxReverseEvent()){
-                metaTraderService.doOrder();
+                if (candles.get(candles.size()-1).isRsiEvent()){
+                    metaTraderService.doOrder();
+                }
             }
         }
     }
