@@ -43,7 +43,6 @@ public class CandleTests {
         given(metaTraderService.getPrice()).willReturn(10.1034);
         candle.start();
 
-        //AssertJUnit.assertEquals(10.1034, candle.startPrice);
         AssertJUnit.assertEquals(System.currentTimeMillis(), candle.startTime);
     }
 
@@ -66,9 +65,7 @@ public class CandleTests {
         candle.start();
         candle.stop(stopTime);
 
-        //AssertJUnit.assertTrue(candle.startTime != 0);
         AssertJUnit.assertTrue(candle.stopTime != 0);
-        //AssertJUnit.assertEquals(candle.stopPrice, 10.1039);
         AssertJUnit.assertEquals(TIME_UNIT, Math.round( (float)(candle.lifeTime())/1000));
     }
 
@@ -78,9 +75,7 @@ public class CandleTests {
         candle.start();
         candle.stop(0);
 
-        //AssertJUnit.assertTrue(candle.startTime != 0);
         AssertJUnit.assertTrue(candle.stopTime != 0);
-        //AssertJUnit.assertEquals(candle.stopPrice, 10.1039);
         AssertJUnit.assertEquals(0, Math.round( (float)(candle.lifeTime())/1000));
     }
 

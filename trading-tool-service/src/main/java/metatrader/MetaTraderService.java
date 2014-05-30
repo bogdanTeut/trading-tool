@@ -27,4 +27,7 @@ public class MetaTraderService {
     public void doOrder() {
         //To change body of created methods use File | Settings | File Templates.
     }
+
+    public void getCalled() {
+    }
 }

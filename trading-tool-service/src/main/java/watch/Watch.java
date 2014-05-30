@@ -71,17 +71,45 @@ public class Watch {
     }
 
     protected void doAlgorithm() {
-        metaTraderService.getAdx();
-        metaTraderService.getRsi();
-        if (candles().size() == 0) return;
+        metaTraderService.getCalled();
+        if (candles().size() < 3) {
+            return;
+        }
+        metaTraderService.getAdx(); //TO DO:  this only for the time being
 
-        if (candles.get(candles.size()-1).isPsarReverseEvent()){
-            if (candles.get(candles.size()-1).isAdxReverseEvent()){
-                if (candles.get(candles.size()-1).isRsiEvent()){
+        if (checkLastFewCandlesForPsarReverseEvent()){
+            if (checkLastFewCandlesForAdxReverseEvent()){
+                if (checkLastCandleForRsiEvent()){
                     metaTraderService.doOrder();
                 }
             }
         }
+    }
+
+    private boolean checkLastFewCandlesForPsarReverseEvent() {
+        for (Candle candle:candles.subList(candles.size()-3, candles.size()-1)){
+            if (candle.isPsarReverseEvent()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkLastFewCandlesForAdxReverseEvent() {
+        for (Candle candle:candles.subList(candles.size()-3, candles.size()-1)){
+            if (candle.isAdxReverseEvent()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkLastCandleForRsiEvent() {
+        Candle candle = candles.get(candles.size()-1);
+        if (candle.isRsiEvent()){
+            return true;
+        }
+        return false;
     }
 
     protected Date firstRunTimeCalendar() {
@@ -100,6 +128,10 @@ public class Watch {
 
     public List<Candle> candles() {
         return candles;
+    }
+
+    public void setScheduledFuture(ScheduledExecutorService scheduledFuture) {
+        this.scheduledFuture = scheduledFuture;
     }
 
     public void setMetaTraderService(MetaTraderService metaTraderService) {
