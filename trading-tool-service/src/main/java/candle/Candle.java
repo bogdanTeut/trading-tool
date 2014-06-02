@@ -78,23 +78,25 @@ public class Candle {
     public boolean calculatePsarReverseEvent() {
         boolean result = false;
         List<Candle> candles = watch.candles();
-        if (candles.size()!=0){
-            Candle prevCandle = candles.get(candles.size()-1);
-            if (stopPrice != 0){
-                if (this.type.equals(CandleEnum.BULLISH) && prevCandle.type.equals(CandleEnum.BEARISH)){
-                    if (this.stopPrice - prevCandle.getPsar() > 0.0010){
-                        result = true;
-                    }
-                };
-                if (this.type.equals(CandleEnum.BEARISH) && prevCandle.type.equals(CandleEnum.BULLISH)){
-                    if (prevCandle.getPsar() - this.stopPrice > 0.0010){
-                        result = true;
-                    }
-                };
+        if (candles.size() != 0) {
+            Candle prevCandle = candles.get(candles.size() - 1);
+            if (checkDownTrend(prevCandle) && psar < startPrice && type.equals(CandleEnum.BULLISH)) {
+                result = true;
+            }
+            if (checkUpTrend(prevCandle) && psar > startPrice  && type.equals(CandleEnum.BEARISH)){
+                result = true;
             }
         }
 
         return result;
+    }
+
+    private boolean checkDownTrend(Candle prevCandle) {
+        return prevCandle.getPsar() >= prevCandle.getStartPrice() && prevCandle.getPsar() >= prevCandle.getStopPrice();
+    }
+
+    private boolean checkUpTrend(Candle prevCandle) {
+        return prevCandle.getPsar() <= prevCandle.getStartPrice() && prevCandle.getPsar() <= prevCandle.getStopPrice();
     }
 
     public boolean isPsarReverseEvent() {
@@ -167,6 +169,14 @@ public class Candle {
 
     public void setRsiEvent(boolean rsiEvent) {
         this.rsiEvent = rsiEvent;
+    }
+
+    public void setStartPrice(double startPrice) {
+        this.startPrice = startPrice;
+    }
+
+    public double getStopPrice() {
+        return stopPrice;
     }
 }
 

@@ -6,12 +6,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.AssertJUnit;
 import org.testng.collections.Lists;
 import watch.Watch;
 
+import java.util.Arrays;
+
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created with IntelliJ IDEA.
@@ -117,68 +121,76 @@ public class CandleTests {
 
     @Test
      public void testGetPsar (){
-        given(metaTraderService.getPsar()).willReturn(10.1034);
         candle.start();
         candle.stop(0);
 
-        AssertJUnit.assertEquals(candle.getPsar(), 10.1034);
+        verify(metaTraderService).getPsar();
     }
 
-    @Test
-    public void testGetPsarReverseEvent(){
-//        given(metaTraderService.getPsar()).willReturn(10.1020);
-//        given(metaTraderService.getPrice()).willReturn(10.1032, 10.1036);
+    @DataProvider(name = "testPsarReverseEventData")
+    public Object[][] testPsarReverseEventData (){
+        return new Object[][]{
+                 //prev candle type     //prev psar     //prev startPrice       //prev stop price       //prev candle type      //actual psar   //actual startPrice     //actual stop price   //result      //comment
+                //down trend cases
+                {CandleEnum.BEARISH,    10.1048,        10.1044,                10.1034,                CandleEnum.BULLISH,     10.1032,        10.1036,                10.1046,              true,         "Bearish, Bullish psarReverseEvent true"},
+                {CandleEnum.BEARISH,    10.1048,        10.1044,                10.1034,                CandleEnum.BEARISH,     10.1032,        10.1036,                10.1031,              false,        "Bearish, Bearish psarReverseEvent false"},
+                {CandleEnum.BULLISH,    10.1048,        10.1034,                10.1044,                CandleEnum.BULLISH,     10.1032,        10.1042,                10.1047,              true,         "Bullish, Bearish psarReverseEvent true"},
 
-        candle.setStopPrice(10.1050);
-        candle.setType(CandleEnum.BULLISH);
+                //up trend cases
+                {CandleEnum.BULLISH,    10.1032,        10.1034,                10.1042,                CandleEnum.BEARISH,     10.1048,        10.1044,                10.1034,              true,         "Bullish, Bearish psarReverseEvent true"},
+                {CandleEnum.BULLISH,    10.1032,        10.1034,                10.1042,                CandleEnum.BULLISH,     10.1048,        10.1040,                10.1044,              false,        "Bullish, Bullish psarReverseEvent false"},
+                {CandleEnum.BEARISH,    10.1032,        10.1034,                10.1042,                CandleEnum.BEARISH,     10.1048,        10.1040,                10.1046,              true,         "Bearish, Bearish psarReverseEvent true"}
+        };
+    }
 
-        Candle prevCandle = createCandle(CandleEnum.BEARISH);
-        given(watch.candles()).willReturn(Lists.newArrayList(prevCandle));
+    @Test(dataProvider = "testPsarReverseEventData")
+    public void testGetPsarReverseEvent(CandleEnum prevCandleType, double prevPsar, double prevStartPrice, double prevStopPrice,
+        CandleEnum actualCandleType, double actualPsar, double actualStartPrice, double actualStopPrice, boolean result, String comment){
 
-        AssertJUnit.assertEquals(candle.calculatePsarReverseEvent(), true);
+        candle.setType(actualCandleType);
+        candle.setPsar(actualPsar);
+        candle.setStartPrice(actualStartPrice);
+        candle.setStopPrice(actualStopPrice);
 
+        Candle prevCandle = createCandle(prevCandleType, prevPsar, prevStartPrice, prevStopPrice);
+        given(watch.candles()).willReturn(Arrays.asList(prevCandle));
 
-
-        candle.setStopPrice(10.1020);
-        candle.setType(CandleEnum.BEARISH);
-
-        prevCandle = createCandle(CandleEnum.BULLISH);
-        given(watch.candles()).willReturn(Lists.newArrayList(prevCandle));
-
-        AssertJUnit.assertEquals(candle.calculatePsarReverseEvent(), true);
+        AssertJUnit.assertEquals(comment, result, candle.calculatePsarReverseEvent());
 
     }
 
-    @Test
-    public void testGetAdxRevertEvent(){
+//    @Test
+//    public void testGetAdxRevertEvent(){
+//
+//        Candle beforePrevCandle = new Candle();
+//        beforePrevCandle.setAdxIndicator(new AdxIndicator(20, 30, 25));
+//
+//        Candle prevCandle = new Candle();
+//        prevCandle.setAdxIndicator(new AdxIndicator(30, 20, 25));
+//
+//        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
+//
+//        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
+//
+//
+//        beforePrevCandle = new Candle();
+//        beforePrevCandle.setAdxIndicator(new AdxIndicator(31, 21, 25));
+//
+//        prevCandle = new Candle();
+//        prevCandle.setAdxIndicator(new AdxIndicator(21, 31, 25));
+//
+//        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
+//
+//        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
+//
+//    }
 
-        Candle beforePrevCandle = new Candle();
-        beforePrevCandle.setAdxIndicator(new AdxIndicator(20, 30, 25));
-
+    private Candle createCandle(CandleEnum candleType, double psar, double startPrice, double stopPrice) {
         Candle prevCandle = new Candle();
-        prevCandle.setAdxIndicator(new AdxIndicator(30, 20, 25));
-
-        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
-
-        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
-
-
-        beforePrevCandle = new Candle();
-        beforePrevCandle.setAdxIndicator(new AdxIndicator(31, 21, 25));
-
-        prevCandle = new Candle();
-        prevCandle.setAdxIndicator(new AdxIndicator(21, 31, 25));
-
-        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
-
-        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
-
-    }
-
-    private Candle createCandle(CandleEnum candleType) {
-        Candle prevCandle = new Candle();
-        prevCandle.setPsar(10.1034);
+        prevCandle.setPsar(psar);
         prevCandle.setType(candleType);
+        prevCandle.setStopPrice(stopPrice);
+        prevCandle.setStartPrice(startPrice);
         return prevCandle;
     }
 
