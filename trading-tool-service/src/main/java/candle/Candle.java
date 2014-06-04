@@ -135,20 +135,27 @@ public class Candle {
         return adxIndicator;
     }
 
-    public boolean calculateAdxReverseEvent() {
+    public String calculateAdxReverseEvent() {
         List<Candle> candleList = watch.candles();
-        AdxIndicator beforePrevCandleAdx = candleList.get(candleList.size()-2).getAdxIndicator();
-        AdxIndicator prevCandleAdx = candleList.get(candleList.size()-1).getAdxIndicator();
+        AdxIndicator thirdLastCandleAdx = candleList.get(candleList.size()-3).getAdxIndicator();
+        //AdxIndicator secondLastCandleAdx = candleList.get(candleList.size()-2).getAdxIndicator();
+        AdxIndicator lastCandleAdx = candleList.get(candleList.size()-1).getAdxIndicator();
 
-        if (beforePrevCandleAdx.getNegativeDirectionalMovementIndicator() < prevCandleAdx.getNegativeDirectionalMovementIndicator()
-            && beforePrevCandleAdx.getPositiveDirectionalMovementIndicator() > prevCandleAdx.getPositiveDirectionalMovementIndicator())
-            return true;
+        if (thirdLastCandleAdx.getPositiveDirectionalMovementIndicator() - lastCandleAdx.getPositiveDirectionalMovementIndicator() > 7 &&
+                lastCandleAdx.getNegativeDirectionalMovementIndicator() - thirdLastCandleAdx.getNegativeDirectionalMovementIndicator() > 7){
+            return "bearish";
+        }
 
-        if (beforePrevCandleAdx.getNegativeDirectionalMovementIndicator() > prevCandleAdx.getNegativeDirectionalMovementIndicator()
-                && beforePrevCandleAdx.getPositiveDirectionalMovementIndicator() < prevCandleAdx.getPositiveDirectionalMovementIndicator())
-            return true;
+        if (lastCandleAdx.getPositiveDirectionalMovementIndicator() - thirdLastCandleAdx.getPositiveDirectionalMovementIndicator() > 7 &&
+                thirdLastCandleAdx.getNegativeDirectionalMovementIndicator() - lastCandleAdx.getNegativeDirectionalMovementIndicator()> 7){
+            return "bullish";
+        }
 
-        return false;
+//        if (beforePrevCandleAdx.getNegativeDirectionalMovementIndicator() > prevCandleAdx.getNegativeDirectionalMovementIndicator()
+//                && beforePrevCandleAdx.getPositiveDirectionalMovementIndicator() < prevCandleAdx.getPositiveDirectionalMovementIndicator())
+//            return true;
+
+        return null;
     }
 
     public void setAdxReverseEvent(boolean adxReverseEvent) {

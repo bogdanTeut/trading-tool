@@ -159,20 +159,41 @@ public class CandleTests {
 
     }
 
-//    @Test
-//    public void testGetAdxRevertEvent(){
-//
-//        Candle beforePrevCandle = new Candle();
-//        beforePrevCandle.setAdxIndicator(new AdxIndicator(20, 30, 25));
-//
-//        Candle prevCandle = new Candle();
-//        prevCandle.setAdxIndicator(new AdxIndicator(30, 20, 25));
-//
-//        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
-//
-//        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
-//
-//
+    @DataProvider(name = "testAdxReverseEventData")
+    public Object[][] testAdxReverseEventData (){
+        return new Object[][]{
+                //-DI            //+DI                  //ADX            //-DI           //+DI                   //ADX              //result            //comment
+                {22,             30,                    25,              30,             20,                     25,                "bearish",          "cross happened"},
+                {22,             28,                    25,              28,             22,                     25,                null,               "cross happened"},
+                {24,             28,                    25,              28,             24,                     25,                null,               "cross didn't happen"},
+                {15,             35,                    25,              24,             26,                     25,                "bearish",          "cross didn't happen"},
+                {15,             35,                    25,              22,             26,                     25,                 null,             "cross didn't happen"},
+
+                {30,             20,                    25,              20,             30,                     25,                "bullish",          "cross happened"},
+                {28,             22,                    25,              22,             28,                     25,                null,               "cross happened"},
+                {28,             24,                    25,              24,             28,                     25,                null,               "cross didn't happen"},
+                {35,             15,                    25,              26,             24,                     25,                "bullish",          "cross didn't happen"},
+                {35,             17,                    25,              26,             24,                     25,                null,               "cross didn't happen"}
+        };
+    }
+
+    @Test(dataProvider = "testAdxReverseEventData")
+    public void testGetAdxRevertEvent(double thirdLastCandleNegativeDi, double thirdLastCandlePositiveDi, double thirdLastCandleAdx, double lastCandleNegativeDi, double lastCandlePositiveDi, double lastCandleAdx, String result, String comment){
+
+        Candle thirdLastCandle = new Candle();
+        thirdLastCandle.setAdxIndicator(new AdxIndicator(thirdLastCandleNegativeDi, thirdLastCandlePositiveDi, thirdLastCandleAdx));
+
+        Candle secondLastCandle = new Candle();
+        secondLastCandle.setAdxIndicator(new AdxIndicator(25, 35, 25));
+
+        Candle lastCandle = new Candle();
+        lastCandle.setAdxIndicator(new AdxIndicator(lastCandleNegativeDi, lastCandlePositiveDi, lastCandleAdx));
+
+        given(watch.candles()).willReturn(Arrays.asList(thirdLastCandle, secondLastCandle, lastCandle));
+
+        AssertJUnit.assertEquals(comment, result, candle.calculateAdxReverseEvent());
+
+
 //        beforePrevCandle = new Candle();
 //        beforePrevCandle.setAdxIndicator(new AdxIndicator(31, 21, 25));
 //
@@ -182,8 +203,8 @@ public class CandleTests {
 //        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
 //
 //        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
-//
-//    }
+
+    }
 
     private Candle createCandle(CandleEnum candleType, double psar, double startPrice, double stopPrice) {
         Candle prevCandle = new Candle();
