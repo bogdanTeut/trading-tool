@@ -27,6 +27,7 @@ public class Candle {
     private AdxIndicator adxIndicator;
     private boolean adxReverseEvent;
     private boolean rsiEvent;
+    private double rsi;
 
     public Candle() {
     }
@@ -57,6 +58,7 @@ public class Candle {
         }
         psar = metaTraderService.getPsar();
         psarReverseEvent = calculatePsarReverseEvent();
+        rsi = metaTraderService.getRsi();
     }
 
     public long getStopTime() {
@@ -137,23 +139,33 @@ public class Candle {
 
     public String calculateAdxReverseEvent() {
         List<Candle> candleList = watch.candles();
-        AdxIndicator thirdLastCandleAdx = candleList.get(candleList.size()-3).getAdxIndicator();
-        //AdxIndicator secondLastCandleAdx = candleList.get(candleList.size()-2).getAdxIndicator();
-        AdxIndicator lastCandleAdx = candleList.get(candleList.size()-1).getAdxIndicator();
+        AdxIndicator secondLastCandleAdx = candleList.get(candleList.size()-2).getAdxIndicator();
+        AdxIndicator currentCandleAdx = getAdxIndicator();
 
-        if (thirdLastCandleAdx.getPositiveDirectionalMovementIndicator() - lastCandleAdx.getPositiveDirectionalMovementIndicator() > 7 &&
-                lastCandleAdx.getNegativeDirectionalMovementIndicator() - thirdLastCandleAdx.getNegativeDirectionalMovementIndicator() > 7){
+        if (secondLastCandleAdx.getPositiveDirectionalMovementIndicator() - currentCandleAdx.getPositiveDirectionalMovementIndicator() > 7 &&
+                currentCandleAdx.getNegativeDirectionalMovementIndicator() - secondLastCandleAdx.getNegativeDirectionalMovementIndicator() > 7){
             return "bearish";
         }
 
-        if (lastCandleAdx.getPositiveDirectionalMovementIndicator() - thirdLastCandleAdx.getPositiveDirectionalMovementIndicator() > 7 &&
-                thirdLastCandleAdx.getNegativeDirectionalMovementIndicator() - lastCandleAdx.getNegativeDirectionalMovementIndicator()> 7){
+        if (currentCandleAdx.getPositiveDirectionalMovementIndicator() - secondLastCandleAdx.getPositiveDirectionalMovementIndicator() > 7 &&
+                secondLastCandleAdx.getNegativeDirectionalMovementIndicator() - currentCandleAdx.getNegativeDirectionalMovementIndicator()> 7){
             return "bullish";
         }
 
-//        if (beforePrevCandleAdx.getNegativeDirectionalMovementIndicator() > prevCandleAdx.getNegativeDirectionalMovementIndicator()
-//                && beforePrevCandleAdx.getPositiveDirectionalMovementIndicator() < prevCandleAdx.getPositiveDirectionalMovementIndicator())
-//            return true;
+        return null;
+    }
+
+    public String calculateRsiEvent() {
+        List<Candle> candleList = watch.candles();
+        Candle secondLastCandle = candleList.get(candleList.size() - 2);
+
+        if (secondLastCandle.getRsi() - getRsi() > 7) {
+            return "bearish";
+        }
+
+        if (getRsi() - secondLastCandle.getRsi()  > 7) {
+            return "bullish";
+        }
 
         return null;
     }
@@ -184,6 +196,14 @@ public class Candle {
 
     public double getStopPrice() {
         return stopPrice;
+    }
+
+    public void setRsi(double rsi) {
+        this.rsi = rsi;
+    }
+
+    public double getRsi() {
+        return rsi;
     }
 }
 
