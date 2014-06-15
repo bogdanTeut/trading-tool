@@ -127,6 +127,14 @@ public class CandleTests {
         verify(metaTraderService).getPsar();
     }
 
+    @Test
+    public void testGetRsi (){
+        candle.start();
+        candle.stop(0);
+
+        verify(metaTraderService).getRsi();
+    }
+
     @DataProvider(name = "testPsarReverseEventData")
     public Object[][] testPsarReverseEventData (){
         return new Object[][]{
@@ -159,31 +167,73 @@ public class CandleTests {
 
     }
 
-//    @Test
-//    public void testGetAdxRevertEvent(){
-//
-//        Candle beforePrevCandle = new Candle();
-//        beforePrevCandle.setAdxIndicator(new AdxIndicator(20, 30, 25));
-//
-//        Candle prevCandle = new Candle();
-//        prevCandle.setAdxIndicator(new AdxIndicator(30, 20, 25));
-//
-//        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
-//
-//        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
-//
-//
-//        beforePrevCandle = new Candle();
-//        beforePrevCandle.setAdxIndicator(new AdxIndicator(31, 21, 25));
-//
-//        prevCandle = new Candle();
-//        prevCandle.setAdxIndicator(new AdxIndicator(21, 31, 25));
-//
-//        given(watch.candles()).willReturn(Lists.newArrayList(beforePrevCandle, prevCandle));
-//
-//        AssertJUnit.assertEquals(candle.calculateAdxReverseEvent(), true);
-//
-//    }
+    @DataProvider(name = "testAdxReverseEventData")
+    public Object[][] testAdxReverseEventData (){
+        return new Object[][]{
+                //-DI            //+DI                  //ADX            //-DI           //+DI                   //ADX              //result            //comment
+                {22,             30,                    25,              30,             20,                     25,                "bearish",          "cross happened"},
+                {22,             28,                    25,              28,             22,                     25,                null,               "cross happened"},
+                {24,             28,                    25,              28,             24,                     25,                null,               "cross didn't happen"},
+                {15,             35,                    25,              24,             26,                     25,                "bearish",          "cross didn't happen"},
+                {15,             35,                    25,              22,             26,                     25,                 null,             "cross didn't happen"},
+
+                {30,             20,                    25,              20,             30,                     25,                "bullish",          "cross happened"},
+                {28,             22,                    25,              22,             28,                     25,                null,               "cross happened"},
+                {28,             24,                    25,              24,             28,                     25,                null,               "cross didn't happen"},
+                {35,             15,                    25,              26,             24,                     25,                "bullish",          "cross didn't happen"},
+                {35,             17,                    25,              26,             24,                     25,                null,               "cross didn't happen"}
+        };
+    }
+
+    @Test(dataProvider = "testAdxReverseEventData")
+    public void testGetAdxRevertEvent(double secondLastCandleNegativeDi, double secondLastCandlePositiveDi, double secondLastCandleAdx, double currentCandleNegativeDi, double currentCandlePositiveDi, double currentCandleAdx, String result, String comment){
+
+        Candle secondLastCandle = new Candle();
+        secondLastCandle.setAdxIndicator(new AdxIndicator(secondLastCandleNegativeDi, secondLastCandlePositiveDi, secondLastCandleAdx));
+
+        Candle lastCandle = new Candle();
+        lastCandle.setAdxIndicator(new AdxIndicator(25, 35, 25));
+
+        candle.setAdxIndicator(new AdxIndicator(currentCandleNegativeDi, currentCandlePositiveDi, currentCandleAdx));
+
+        given(watch.candles()).willReturn(Arrays.asList(secondLastCandle, lastCandle));
+
+        AssertJUnit.assertEquals(comment, result, candle.calculateAdxReverseEvent());
+
+    }
+
+    @DataProvider(name = "testRsiEventData")
+    public Object[][] testRsiEventData(){
+        return new Object[][]{
+              //1st RSI        //3rd RSI             //result            //comment
+                {60,             50,                 "bearish",          "rsi happened"},
+                {60,             55,                 null,               "rsi didn't happen"},
+                {50,             60,                 "bullish",          "rsi didn't happen, it's a down bearish trend"},
+
+                {50,             60,                 "bullish",          "rsi happened"},
+                {55,             60,                 null,               "rsi didn't happen"},
+                {60,             50,                 "bearish",          "rsi didn't happen, it's an up trend"},
+
+
+        };
+    }
+
+    @Test(dataProvider = "testRsiEventData")
+    public void testRsiEvent(double secondLastCandleRsi, double currentCandleRsi, String result, String comment){
+
+        Candle secondLastCandle = new Candle();
+        secondLastCandle.setRsi(secondLastCandleRsi);
+
+        Candle lastCandle = new Candle();
+        lastCandle.setRsi(57);
+
+        candle.setRsi(currentCandleRsi);
+
+        given(watch.candles()).willReturn(Arrays.asList(secondLastCandle, lastCandle));
+
+        AssertJUnit.assertEquals(comment, result, candle.calculateRsiEvent());
+
+    }
 
     private Candle createCandle(CandleEnum candleType, double psar, double startPrice, double stopPrice) {
         Candle prevCandle = new Candle();
