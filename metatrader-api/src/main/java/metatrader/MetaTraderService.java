@@ -1,27 +1,36 @@
 package metatrader;
 
+import indicators.AdxIndicator;
+
 /**
  * Created with IntelliJ IDEA.
- * User: bogdan
- * Date: 15/04/14
- * Time: 22:51
+ * User: bogdan.teut
+ * Date: 18/06/14
+ * Time: 15:49
  * To change this template use File | Settings | File Templates.
  */
 public class MetaTraderService {
+
+
+    private double price;
+    private double psar;
+    private AdxIndicator adx;
+    private double rsi;
+
     public double getPrice() {
-        return 0;
+        return price;
     }
 
     public double getPsar() {
-        return 0;
+        return psar;
     }
 
-    public double getAdx() {
-        return 0;
+    public AdxIndicator getAdx() {
+        return new AdxIndicator(0, 0, 0);
     }
 
     public double getRsi() {
-        return 0;
+        return rsi;
     }
 
     public void doOrder() {

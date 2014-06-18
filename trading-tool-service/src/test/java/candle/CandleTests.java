@@ -128,7 +128,15 @@ public class CandleTests {
     }
 
     @Test
-    public void testGetRsi (){
+    public void testGetAdx(){
+        candle.start();
+        candle.stop(0);
+
+        verify(metaTraderService).getAdx();
+    }
+
+    @Test
+    public void testGetRsi(){
         candle.start();
         candle.stop(0);
 

@@ -58,6 +58,7 @@ public class Candle {
         }
         psar = metaTraderService.getPsar();
         psarReverseEvent = calculatePsarReverseEvent();
+        adxIndicator = metaTraderService.getAdx();
         rsi = metaTraderService.getRsi();
     }
 
